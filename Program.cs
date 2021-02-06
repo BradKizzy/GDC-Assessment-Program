@@ -2,6 +2,7 @@
 using System.IO;
 using System.Text;
 using System.Linq;
+using System.Text.RegularExpressions;
 using System.Collections.Generic;
 //Author: Bradley Kisner
 //Date: 01/19/2021
@@ -29,6 +30,7 @@ var lines = File.ReadLines(name, Encoding.UTF8);
 var users = from line in lines
             let fields = line.Replace(", ", ",").Split(",")
             select new User(fields[2]);
+            users = users.Skip(1).ToArray();
 //This variable is created to sort the email addresses in descending order.
 var sorted = from user in users
              orderby user.EmailAddress descending
@@ -39,12 +41,12 @@ List<String> invalid = new List<String>();
 //This loop is responsible for checking each email to see if they are valid or not. In this case, emails are determined to be valid if they end with the following domains.
 foreach(var user in sorted)
 {
-    var str = user.EmailAddress;
-    if(str.EndsWith(".com" )|| str.EndsWith(".net") || str.EndsWith(".gov") || str.EndsWith(".edu"))
+    var emailAddress = user.EmailAddress;
+    if(EmailValidator.IsValidEmailAddress(emailAddress))
     {
-        valid.Add(str);
+        valid.Add(emailAddress);
     }else{
-        invalid.Add(str);
+        invalid.Add(emailAddress);
     }
 }
 //This loop notifies the user with the number of valid email addresses within their selected file, along with the addresses listed in descending order.
@@ -70,5 +72,7 @@ foreach (var email in invalid)
 }
     //This is meant to consider the email addresses as users.
     public record User(string EmailAddress);
+
+
 }
 }
